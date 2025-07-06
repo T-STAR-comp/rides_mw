@@ -1,6 +1,41 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import styles from './styles/home.module.css';
 import DestinationPicker from '../components/DestinationPicker';
+import { GoogleMap, Marker, useLoadScript } from '@react-google-maps/api';
+
+const mapContainerStyle = {
+  width: '100%',
+  height: '100%',
+  borderRadius: '24px',
+  minHeight: '320px',
+  boxShadow: '0 8px 32px rgba(0,0,0,0.10)'
+};
+const defaultCenter = { lat: -13.9626, lng: 33.7741 };
+const mapOptions = {
+  disableDefaultUI: true,
+  zoomControl: true,
+  styles: [
+    { elementType: 'geometry', stylers: [{ color: '#f5f5f5' }] },
+    { elementType: 'labels.icon', stylers: [{ visibility: 'off' }] },
+    { elementType: 'labels.text.fill', stylers: [{ color: '#333' }] },
+    { elementType: 'labels.text.stroke', stylers: [{ color: '#fff' }] },
+    {
+      featureType: 'water',
+      elementType: 'geometry',
+      stylers: [{ color: '#e3e6ea' }]
+    },
+    {
+      featureType: 'road',
+      elementType: 'geometry',
+      stylers: [{ color: '#fff' }]
+    },
+    {
+      featureType: 'poi.park',
+      elementType: 'geometry',
+      stylers: [{ color: '#f7f8fa' }]
+    }
+  ]
+};
 
 const Home = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -17,6 +52,14 @@ const Home = () => {
   const [availableRides, setAvailableRides] = useState([]);
   const [ridesLoading, setRidesLoading] = useState(false);
   const [selectedRide, setSelectedRide] = useState(null);
+  const [mapCenter, setMapCenter] = useState(defaultCenter);
+  const [marker, setMarker] = useState(null);
+
+  const { isLoaded } = useLoadScript({
+    googleMapsApiKey: 'AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8',
+    libraries: ['places']
+  });
+  const mapRef = useRef();
 
   useEffect(() => {
     setIsVisible(true);
@@ -33,8 +76,11 @@ const Home = () => {
       
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          console.log('Location obtained:', position.coords);
           setUserLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          });
+          setMapCenter({
             lat: position.coords.latitude,
             lng: position.coords.longitude
           });
@@ -42,20 +88,31 @@ const Home = () => {
           setMapLoaded(true);
         },
         (error) => {
-          console.log('Location permission denied:', error);
           setLocationPermission('denied');
-          // Set default location (Lilongwe, Malawi)
-          setUserLocation({ lat: -13.9626, lng: 33.7741 });
+          setUserLocation(defaultCenter);
+          setMapCenter(defaultCenter);
           setMapLoaded(true);
         },
         options
       );
     } else {
       setLocationPermission('not-supported');
-      setUserLocation({ lat: -13.9626, lng: 33.7741 });
+      setUserLocation(defaultCenter);
+      setMapCenter(defaultCenter);
       setMapLoaded(true);
     }
   };
+
+  const onMapLoad = useCallback((map) => {
+    mapRef.current = map;
+  }, []);
+
+  const onMapClick = useCallback((event) => {
+    setMarker({
+      lat: event.latLng.lat(),
+      lng: event.latLng.lng()
+    });
+  }, []);
 
   const scrollToFeatures = () => {
     document.getElementById('features').scrollIntoView({ behavior: 'smooth' });
@@ -255,42 +312,46 @@ const Home = () => {
         <div className={styles.heroVisual}>
           {/* Google Maps Container */}
           <div className={styles.mapContainer}>
-            {!mapLoaded ? (
+            {!isLoaded ? (
               <div className={styles.mapLoading}>
                 <div className={styles.mapSpinner} />
                 <p className={styles.mapLoadingText}>Loading map...</p>
               </div>
             ) : (
-              <div className={styles.mapWrapper}>
-                <iframe
-                  src={`https://www.google.com/maps/embed/v1/view?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&center=${userLocation?.lat},${userLocation?.lng}&zoom=18&maptype=roadmap`}
-                  className={styles.mapIframe}
-                  allowFullScreen=""
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                />
-                
-                {/* Custom User Location Marker */}
-                {locationPermission === 'granted' && (
-                  <div className={styles.locationMarker}>
-                    {/* Outer Pulse Ring */}
-                    <div className={styles.pulseRing} />
-                    
-                    {/* Inner Pulse Ring */}
-                    <div className={styles.pulseRingInner} />
-                    
-                    {/* Main Marker */}
-                    <div className={styles.markerDot} />
-                    
-                    {/* Location Label */}
-                    <div className={styles.locationLabel}>
-                      You are here
-                    </div>
-                  </div>
+              <GoogleMap
+                mapContainerStyle={mapContainerStyle}
+                center={mapCenter}
+                zoom={17}
+                options={mapOptions}
+                onLoad={onMapLoad}
+                onClick={onMapClick}
+              >
+                {/* User Location Marker */}
+                {userLocation && (
+                  <Marker
+                    position={userLocation}
+                    icon={{
+                      path: google.maps.SymbolPath.CIRCLE,
+                      scale: 10,
+                      fillColor: '#FF6B35',
+                      fillOpacity: 1,
+                      strokeWeight: 2,
+                      strokeColor: '#fff'
+                    }}
+                  />
                 )}
-              </div>
+                {/* Clicked Marker */}
+                {marker && (
+                  <Marker
+                    position={marker}
+                    icon={{
+                      url: 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png',
+                      scaledSize: new window.google.maps.Size(40, 40)
+                    }}
+                  />
+                )}
+              </GoogleMap>
             )}
-            
             {/* Map Overlay with Location Status */}
             {mapLoaded && (
               <div className={styles.mapOverlay}>
@@ -302,7 +363,6 @@ const Home = () => {
                     RidesMw
                   </span>
                 </div>
-                
                 <div className={styles.locationStatus}>
                   <div className={`${styles.statusDot} ${locationPermission === 'granted' ? styles.granted : styles.denied}`} />
                   <span className={styles.statusText}>

@@ -1,41 +1,87 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import styles from './DestinationPicker.module.css';
+import { GoogleMap, Marker, useLoadScript } from '@react-google-maps/api';
+
+const mapContainerStyle = {
+  width: '100%',
+  height: '240px',
+  borderRadius: '16px',
+  minHeight: '180px',
+  boxShadow: '0 4px 16px rgba(0,0,0,0.08)'
+};
+const mapOptions = {
+  disableDefaultUI: true,
+  zoomControl: true,
+  styles: [
+    { elementType: 'geometry', stylers: [{ color: '#f5f5f5' }] },
+    { elementType: 'labels.icon', stylers: [{ visibility: 'off' }] },
+    { elementType: 'labels.text.fill', stylers: [{ color: '#333' }] },
+    { elementType: 'labels.text.stroke', stylers: [{ color: '#fff' }] },
+    {
+      featureType: 'water',
+      elementType: 'geometry',
+      stylers: [{ color: '#e3e6ea' }]
+    },
+    {
+      featureType: 'road',
+      elementType: 'geometry',
+      stylers: [{ color: '#fff' }]
+    },
+    {
+      featureType: 'poi.park',
+      elementType: 'geometry',
+      stylers: [{ color: '#f7f8fa' }]
+    }
+  ]
+};
 
 const DestinationPicker = ({ onDestinationSelect, currentLocation }) => {
   const [selectedLocation, setSelectedLocation] = useState(null);
-  const [mapLoaded, setMapLoaded] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [mapCenter, setMapCenter] = useState(currentLocation);
+  const [marker, setMarker] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    setMapLoaded(true);
+  const { isLoaded } = useLoadScript({
+    googleMapsApiKey: 'AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8',
+    libraries: ['places']
+  });
+  const mapRef = useRef();
+
+  const onMapLoad = useCallback((map) => {
+    mapRef.current = map;
   }, []);
 
-  const handleMapClick = (event) => {
-    // In a real implementation, you would convert screen coordinates to map coordinates
-    // For now, we'll simulate a location selection
-    const mockLocation = {
-      lat: currentLocation.lat + (Math.random() - 0.5) * 0.01,
-      lng: currentLocation.lng + (Math.random() - 0.5) * 0.01,
-      address: 'Selected Location'
-    };
-    
-    setSelectedLocation(mockLocation);
-    onDestinationSelect(mockLocation);
-  };
+  const onMapClick = useCallback((event) => {
+    const lat = event.latLng.lat();
+    const lng = event.latLng.lng();
+    setMarker({ lat, lng });
+    setSelectedLocation({ lat, lng, address: 'Selected Location' });
+    onDestinationSelect({ lat, lng, address: 'Selected Location' });
+  }, [onDestinationSelect]);
 
-  const handleSearch = (e) => {
+  const handleSearch = async (e) => {
     e.preventDefault();
-    if (searchQuery.trim()) {
-      // In a real implementation, you would geocode the search query
-      const mockLocation = {
-        lat: currentLocation.lat + (Math.random() - 0.5) * 0.01,
-        lng: currentLocation.lng + (Math.random() - 0.5) * 0.01,
-        address: searchQuery
-      };
-      
-      setSelectedLocation(mockLocation);
-      onDestinationSelect(mockLocation);
-    }
+    if (!searchQuery.trim()) return;
+    setLoading(true);
+    // Geocode the search query
+    const geocoder = new window.google.maps.Geocoder();
+    geocoder.geocode({ address: searchQuery }, (results, status) => {
+      setLoading(false);
+      if (status === 'OK' && results[0]) {
+        const { lat, lng } = results[0].geometry.location;
+        const coords = { lat: lat(), lng: lng() };
+        setMapCenter(coords);
+        setMarker(coords);
+        setSelectedLocation({ ...coords, address: results[0].formatted_address });
+        onDestinationSelect({ ...coords, address: results[0].formatted_address });
+        if (mapRef.current) {
+          mapRef.current.panTo(coords);
+        }
+      } else {
+        alert('Location not found. Try a different search.');
+      }
+    });
   };
 
   return (
@@ -49,47 +95,39 @@ const DestinationPicker = ({ onDestinationSelect, currentLocation }) => {
             placeholder="Search for destination..."
             className={styles.searchInput}
           />
-          <button type="submit" className={styles.searchButton}>
-            Search
+          <button type="submit" className={styles.searchButton} disabled={loading}>
+            {loading ? 'Searching...' : 'Search'}
           </button>
         </form>
       </div>
-
       <div className={styles.mapContainer}>
-        {!mapLoaded ? (
+        {!isLoaded ? (
           <div className={styles.mapLoading}>
             <div className={styles.mapSpinner} />
             <p>Loading map...</p>
           </div>
         ) : (
-          <div className={styles.mapWrapper} onClick={handleMapClick}>
-            <iframe
-              src={`https://www.google.com/maps/embed/v1/view?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&center=${currentLocation.lat},${currentLocation.lng}&zoom=15&maptype=roadmap`}
-              className={styles.mapIframe}
-              allowFullScreen=""
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-            />
-            
-            {/* Click indicator */}
-            <div className={styles.clickIndicator}>
-              <div className={styles.clickIcon}>📍</div>
-              <p>Click on the map to select destination</p>
-            </div>
-
-            {/* Selected location marker */}
-            {selectedLocation && (
-              <div className={styles.selectedMarker}>
-                <div className={styles.markerDot} />
-                <div className={styles.markerLabel}>
-                  {selectedLocation.address}
-                </div>
-              </div>
+          <GoogleMap
+            mapContainerStyle={mapContainerStyle}
+            center={mapCenter}
+            zoom={15}
+            options={mapOptions}
+            onLoad={onMapLoad}
+            onClick={onMapClick}
+          >
+            {/* Marker for selected location */}
+            {marker && (
+              <Marker
+                position={marker}
+                icon={{
+                  url: 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png',
+                  scaledSize: new window.google.maps.Size(36, 36)
+                }}
+              />
             )}
-          </div>
+          </GoogleMap>
         )}
       </div>
-
       {selectedLocation && (
         <div className={styles.selectedLocation}>
           <h3>Selected Destination:</h3>
