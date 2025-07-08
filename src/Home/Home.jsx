@@ -1,7 +1,12 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import styles from './styles/home.module.css';
 import DestinationPicker from '../components/DestinationPicker';
+import Footer from '../components/footer';
 import { GoogleMap, Marker, useLoadScript } from '@react-google-maps/api';
+import { requestRide, cancelRide } from '../api/rideApi';
+import { connectRideSocket } from './rideSocket';
+import { getDistanceKm, getRidePrice } from '../utils/distance';
+import { fetchNearRides } from '../api/fetchNearRides';
 
 const mapContainerStyle = {
   width: '100%',
@@ -54,6 +59,16 @@ const Home = () => {
   const [selectedRide, setSelectedRide] = useState(null);
   const [mapCenter, setMapCenter] = useState(defaultCenter);
   const [marker, setMarker] = useState(null);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [showTrackModal, setShowTrackModal] = useState(false);
+  const [trackRideStatus, setTrackRideStatus] = useState('on the way');
+  const [trackRideLoading, setTrackRideLoading] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successData, setSuccessData] = useState(null);
+  const [currentBooking, setCurrentBooking] = useState(null);
+  const [cancelError, setCancelError] = useState('');
+  const [distanceKm, setDistanceKm] = useState(null);
+  const [calculatedPrice, setCalculatedPrice] = useState(null);
 
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: 'AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8',
@@ -64,6 +79,16 @@ const Home = () => {
   useEffect(() => {
     setIsVisible(true);
     requestLocationPermission();
+    const ws = connectRideSocket({
+      onBooking: (bookingData) => {
+        if (bookingData && Array.isArray(bookingData.bookings) && bookingData.bookings.length > 0) {
+          setCurrentBooking(bookingData.bookings[0]);
+        }
+      }
+    });
+    return () => {
+      if (ws && ws.readyState === 1) ws.close();
+    };
   }, []);
 
   const requestLocationPermission = () => {
@@ -118,8 +143,16 @@ const Home = () => {
     document.getElementById('features').scrollIntoView({ behavior: 'smooth' });
   };
 
-  const handleFindRides = () => {
+  const handleFindRides = async () => {
     setShowModal(true);
+    if (userLocation && userLocation.lat && userLocation.lng) {
+      try {
+        const data = await fetchNearRides({ lat: userLocation.lat, lng: userLocation.lng });
+        console.log('Nearby rides from server:', data);
+      } catch (err) {
+        console.error('Failed to fetch nearby rides:', err);
+      }
+    }
     fetchAvailableRides();
   };
 
@@ -142,75 +175,47 @@ const Home = () => {
       ...prev,
       destination: destination.address
     }));
+    if (destination.lat && destination.lng) {
+      setMarker({ lat: destination.lat, lng: destination.lng });
+    }
   };
 
   const fetchAvailableRides = async () => {
     setRidesLoading(true);
-    
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    // Mock available rides data
-    const mockRides = [
-      {
-        id: 1,
-        driver: {
-          name: 'John Banda',
-          rating: 4.8,
-          vehicle: 'Toyota Corolla',
-          plate: 'MW 1234'
-        },
-        price: 2500,
-        currency: 'MWK',
-        estimatedTime: '5 min',
-        distance: '2.1 km',
-        vehicleType: 'Economy'
-      },
-      {
-        id: 2,
-        driver: {
-          name: 'Sarah Mhango',
-          rating: 4.9,
-          vehicle: 'Honda Civic',
-          plate: 'MW 5678'
-        },
-        price: 3200,
-        currency: 'MWK',
-        estimatedTime: '3 min',
-        distance: '1.8 km',
-        vehicleType: 'Comfort'
-      },
-      {
-        id: 3,
-        driver: {
-          name: 'Mike Phiri',
-          rating: 4.7,
-          vehicle: 'Toyota Camry',
-          plate: 'MW 9012'
-        },
-        price: 4500,
-        currency: 'MWK',
-        estimatedTime: '7 min',
-        distance: '3.2 km',
-        vehicleType: 'Premium'
-      },
-      {
-        id: 4,
-        driver: {
-          name: 'Grace Nkhoma',
-          rating: 4.6,
-          vehicle: 'Suzuki Swift',
-          plate: 'MW 3456'
-        },
-        price: 2000,
-        currency: 'MWK',
-        estimatedTime: '8 min',
-        distance: '2.8 km',
-        vehicleType: 'Economy'
+    if (userLocation && userLocation.lat && userLocation.lng) {
+      try {
+        const data = await fetchNearRides({ lat: userLocation.lat, lng: userLocation.lng });
+        // data.drivers is an array of driver objects
+        const rides = (data.drivers || []).map((driver, idx) => {
+          const distance = driver.distance_km !== undefined && driver.distance_km !== null ? parseFloat(driver.distance_km) : null;
+          const rate = driver.rate_per_km ? parseFloat(driver.rate_per_km) : null;
+          const price = (distance && rate) ? Math.round(distance * rate) : rate || 0;
+          return {
+            id: driver.id || idx,
+            driver: {
+              name: driver.full_name,
+              rating: parseFloat(driver.driver_rating),
+              vehicle: driver.car_type,
+              plate: driver.car_plate,
+              rate: rate,
+              email: driver.email,
+              vehicleType: driver.vehicle_type
+            },
+            price: price,
+            currency: 'MWK',
+            estimatedTime: driver.estimated_minutes !== undefined && driver.estimated_minutes !== null ? `${driver.estimated_minutes} min` : '—',
+            distance: distance !== null ? `${distance.toFixed(2)} km` : '—',
+            vehicleType: driver.vehicle_type
+          };
+        });
+        setAvailableRides(rides);
+      } catch (err) {
+        setAvailableRides([]);
+        // Optionally handle error
       }
-    ];
-    
-    setAvailableRides(mockRides);
+    } else {
+      setAvailableRides([]);
+    }
     setRidesLoading(false);
   };
 
@@ -218,20 +223,41 @@ const Home = () => {
     setSelectedRide(ride);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!selectedRide) {
       alert('Please select a ride first!');
       return;
     }
-    
-    console.log('Booking ride:', { ...formData, selectedRide });
-    // Here you would typically send the data to your backend
-    alert(`Ride booked with ${selectedRide.driver.name}! We'll contact you soon.`);
-    setShowModal(false);
-    setFormData({ name: '', destination: '', phone: '', notes: '' });
-    setSelectedRide(null);
-    setAvailableRides([]);
+
+    // Prepare data for ride request
+    const pickup = userLocation;
+    const destination = marker;
+    const driver = selectedRide.driver;
+    const price = calculatedPrice ?? selectedRide.price;
+    const phone = formData.phone;
+
+    try {
+      const response = await requestRide({ pickup, destination, driver, price, phone });
+      setShowModal(false);
+      setFormData({ name: '', destination: '', phone: '', notes: '' });
+      setSelectedRide(null);
+      setAvailableRides([]);
+      setSuccessData({
+        driver,
+        destination,
+        price,
+        eta: selectedRide.estimatedTime,
+        message: response.message || 'Ride booked successfully!'
+      });
+      setShowSuccessModal(true);
+      setTimeout(() => {
+        setShowSuccessModal(false);
+        setSuccessData(null);
+      }, 2500);
+    } catch (err) {
+      alert('Failed to book ride: ' + err.message);
+    }
   };
 
   const getDriverInitials = (name) => {
@@ -254,6 +280,82 @@ const Home = () => {
     return stars;
   };
 
+  // Logout handler
+  const handleLogout = () => {
+    sessionStorage.clear();
+    window.location.reload();
+  };
+
+  // Track Ride actions
+  const handleCancelRide = async () => {
+    if (!currentBooking) return;
+    setTrackRideLoading(true);
+    setCancelError('');
+    try {
+      await cancelRide({ id: currentBooking.id });
+      setTrackRideStatus('cancelled');
+    } catch (err) {
+      setCancelError(err.message || 'Failed to cancel ride');
+    } finally {
+      setTrackRideLoading(false);
+    }
+  };
+  const handlePayNow = () => {
+    setTrackRideLoading(true);
+    setTimeout(() => {
+      setTrackRideStatus('paid');
+      setTrackRideLoading(false);
+    }, 1200);
+  };
+
+  // Example current ride data (replace with real data as needed)
+  const booking = currentBooking;
+  const currentRide = booking
+    ? {
+        driver: {
+          name: booking.driver_name,
+          vehicle: booking.driver_vehicle,
+          plate: booking.driver_plate,
+          rating: booking.driver_rating,
+        },
+        eta: '',
+        status: booking.status,
+        pickup: booking.current_location_name || `${booking.current_lat}, ${booking.current_lng}`,
+        destination: booking.destination_name || `${booking.destination_lat}, ${booking.destination_lng}`,
+        fare: booking.price,
+        currency: 'MWK',
+        mapCenter: { lat: parseFloat(booking.current_lat), lng: parseFloat(booking.current_lng) },
+        marker: { lat: parseFloat(booking.destination_lat), lng: parseFloat(booking.destination_lng) },
+      }
+    : {
+        driver: {
+          name: 'Sarah Mhango',
+          vehicle: 'Honda Civic',
+          plate: 'MW 5678',
+          phone: '+265 999 123 456',
+        },
+        eta: '3 min',
+        status: 'on the way',
+        pickup: 'Lilongwe City Centre',
+        destination: 'Area 47, Lilongwe',
+        fare: 3200,
+        currency: 'MWK',
+        mapCenter: { lat: -13.9626, lng: 33.7741 },
+        marker: { lat: -13.9626, lng: 33.7741 },
+      };
+
+  // Recalculate distance and price when marker or selectedRide changes
+  useEffect(() => {
+    if (userLocation && marker && selectedRide && selectedRide.driver && selectedRide.driver.rate) {
+      const dist = getDistanceKm(userLocation.lat, userLocation.lng, marker.lat, marker.lng);
+      setDistanceKm(dist);
+      setCalculatedPrice(getRidePrice(dist, selectedRide.driver.rate));
+    } else {
+      setDistanceKm(null);
+      setCalculatedPrice(null);
+    }
+  }, [userLocation, marker, selectedRide]);
+
   return (
     <div className={styles.container}>
       {/* Header */}
@@ -263,6 +365,12 @@ const Home = () => {
             <div className={styles.logoIcon}>R</div>
             RidesMw
           </a>
+          <button className={styles.logoutBtn} onClick={() => setShowLogoutModal(true)}>
+            Log Out
+          </button>
+          <button className={styles.trackBtn} onClick={() => setShowTrackModal(true)}>
+            Track Ride
+          </button>
         </div>
       </header>
 
@@ -584,21 +692,6 @@ const Home = () => {
             <form onSubmit={handleSubmit} className={styles.form}>
               <div className={styles.formGroup}>
                 <label className={styles.formLabel}>
-                  Your Name
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  required
-                  className={styles.formInput}
-                  placeholder="Enter your full name"
-                />
-              </div>
-              
-              <div className={styles.formGroup}>
-                <label className={styles.formLabel}>
                   Destination
                 </label>
                 {userLocation && (
@@ -638,10 +731,16 @@ const Home = () => {
                 />
               </div>
               
+              {distanceKm && calculatedPrice && (
+                <div className={styles.priceInfo}>
+                  Distance: {distanceKm.toFixed(2)} km | Price: {calculatedPrice.toLocaleString()} MWK
+                </div>
+              )}
+              
               <button
                 type="submit"
                 className={styles.submitButton}
-                disabled={!selectedRide}
+                disabled={!selectedRide || !marker}
               >
                 {selectedRide ? `Book with ${selectedRide.driver.name}` : 'Select a ride first'}
               </button>
@@ -657,6 +756,101 @@ const Home = () => {
           </div>
         </>
       )}
+
+      {/* Logout Modal */}
+      {showLogoutModal && (
+        <>
+          <div className={styles.modalBackdrop} onClick={() => setShowLogoutModal(false)} />
+          <div className={styles.logoutModal}>
+            <div className={styles.modalHandle} />
+            <div className={styles.modalHeader}>
+              <h2 className={styles.modalTitle}>Log Out</h2>
+            </div>
+            <div className={styles.logoutMessage}>
+              Are you sure you want to log out?
+            </div>
+            <div className={styles.modalActions}>
+              <button className={styles.cancelButton} onClick={() => setShowLogoutModal(false)}>
+                Cancel
+              </button>
+              <button className={styles.logoutButton} onClick={handleLogout}>
+                Log Out
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Track Ride Modal */}
+      {showTrackModal && (
+        <>
+          <div className={styles.modalBackdrop} onClick={() => setShowTrackModal(false)} />
+          <div className={styles.trackModal}>
+            <div className={styles.modalHandle} />
+            <div className={styles.modalHeader}>
+              <h2 className={styles.modalTitle}>Track Your Ride</h2>
+            </div>
+            {currentBooking ? (
+              <div className={styles.trackRideInfo}>
+                <div className={styles.trackDriverRow}>
+                  <div className={styles.trackDriverAvatar}>{currentRide.driver.name.split(' ').map(n => n[0]).join('')}</div>
+                  <div className={styles.trackDriverDetails}>
+                    <div className={styles.trackDriverName}>{currentRide.driver.name}</div>
+                    <div className={styles.trackDriverCar}>{currentRide.driver.vehicle} • {currentRide.driver.plate}</div>
+                    <div className={styles.trackDriverEta}>ETA: {currentRide.eta}</div>
+                  </div>
+                </div>
+                <div className={styles.trackRideStatusRow}>
+                  <span className={styles.trackRideStatus + ' ' + styles[currentRide.status.replace(/\s/g, '')]}>{currentRide.status}</span>
+                  <span className={styles.trackRideFare}>{currentRide.fare.toLocaleString()} {currentRide.currency}</span>
+                </div>
+                <div className={styles.trackRideLocations}>
+                  <div><strong>From:</strong> {currentRide.pickup}</div>
+                  <div><strong>To:</strong> {currentRide.destination}</div>
+                </div>
+              </div>
+            ) : (
+              <div className={styles.noBookingMsg}>No booked rides available</div>
+            )}
+            {currentBooking && (
+              <div className={styles.modalActions}>
+                <button className={styles.cancelButton} onClick={handleCancelRide} disabled={trackRideLoading || currentRide.status === 'cancelled' || currentRide.status === 'paid'}>
+                  {trackRideLoading && currentRide.status !== 'paid' && currentRide.status !== 'cancelled' ? 'Cancelling...' : 'Cancel Ride'}
+                </button>
+                <button className={styles.payButton} onClick={handlePayNow} disabled={trackRideLoading || currentRide.status === 'paid' || currentRide.status === 'cancelled'}>
+                  {trackRideLoading && currentRide.status !== 'paid' && currentRide.status !== 'cancelled' ? 'Processing...' : currentRide.status === 'paid' ? 'Paid' : 'Pay Now'}
+                </button>
+              </div>
+            )}
+            {cancelError && <div className={styles.errorText}>{cancelError}</div>}
+          </div>
+        </>
+      )}
+
+      {/* Success Modal */}
+      {showSuccessModal && successData && (
+        <div className={styles.successModalBackdrop}>
+          <div className={styles.successModal}>
+            <div className={styles.successCheckmark}>
+              <svg width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="28" cy="28" r="28" fill="#2ecc71"/>
+                <path d="M16 29.5L25 38L40 21" stroke="#fff" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+            <h2 className={styles.successTitle}>Ride Booked!</h2>
+            <div className={styles.successMessage}>{successData.message}</div>
+            <div className={styles.successSummary}>
+              <div><strong>Driver:</strong> {successData.driver.name} ({successData.driver.vehicle}, {successData.driver.plate})</div>
+              <div><strong>Destination:</strong> {successData.destination.lat.toFixed(5)}, {successData.destination.lng.toFixed(5)}</div>
+              <div><strong>Price:</strong> {successData.price.toLocaleString()} MWK</div>
+              <div><strong>ETA:</strong> {successData.eta}</div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };

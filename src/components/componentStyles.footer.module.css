@@ -1,0 +1,448 @@
+/* Footer Styles */
+.footer {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  color: #ffffff;
+  margin-top: 4rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 107, 53, 0.5), transparent);
+}
+
+.footerContent {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* Main Footer Sections */
+.footerMain {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 3rem;
+  padding: 4rem 0 2rem;
+}
+
+.footerSection {
+  display: flex;
+  flex-direction: column;
+}
+
+.logoSection {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 1.5rem;
+}
+
+.logoIcon {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #FF6B35, #FF8A65);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 24px;
+  box-shadow: 0 4px 16px rgba(255, 107, 53, 0.3);
+}
+
+.logoText {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0;
+  background: linear-gradient(135deg, #FF6B35, #FF8A65);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.companyDescription {
+  color: #b0b0b0;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+  font-size: 15px;
+}
+
+.socialLinks {
+  display: flex;
+  gap: 16px;
+}
+
+.socialLink {
+  width: 44px;
+  height: 44px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #b0b0b0;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.socialLink:hover {
+  background: linear-gradient(135deg, #FF6B35, #FF8A65);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(255, 107, 53, 0.3);
+}
+
+.sectionTitle {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: #ffffff;
+  letter-spacing: -0.2px;
+}
+
+.footerLinks {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footerLinks li {
+  margin-bottom: 12px;
+}
+
+.footerLink {
+  color: #b0b0b0;
+  text-decoration: none;
+  font-size: 15px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.footerLink:hover {
+  color: #FF6B35;
+  transform: translateX(4px);
+}
+
+.footerLink::before {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 50%;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(135deg, #FF6B35, #FF8A65);
+  transition: width 0.3s ease;
+  transform: translateY(-50%);
+}
+
+.footerLink:hover::before {
+  width: 4px;
+}
+
+.contactInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.contactItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #b0b0b0;
+  font-size: 15px;
+}
+
+.contactIcon {
+  color: #FF6B35;
+  flex-shrink: 0;
+}
+
+/* Member Login Section */
+.memberSection {
+  background: linear-gradient(135deg, rgba(255, 107, 53, 0.1), rgba(255, 138, 101, 0.1));
+  border-radius: 24px;
+  padding: 2.5rem;
+  margin: 2rem 0;
+  border: 1px solid rgba(255, 107, 53, 0.2);
+  backdrop-filter: blur(20px);
+  position: relative;
+  overflow: hidden;
+}
+
+.memberSection::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 107, 53, 0.05), rgba(255, 138, 101, 0.05));
+  border-radius: 24px;
+  z-index: -1;
+}
+
+.memberContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.memberInfo {
+  flex: 1;
+}
+
+.memberTitle {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+}
+
+.memberDescription {
+  color: #b0b0b0;
+  line-height: 1.6;
+  font-size: 16px;
+  margin: 0;
+}
+
+.memberActions {
+  display: flex;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.memberLoginBtn,
+.driverLoginBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 24px;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  letter-spacing: -0.2px;
+}
+
+.memberLoginBtn {
+  background: linear-gradient(135deg, #FF6B35, #FF8A65);
+  color: white;
+  box-shadow: 0 4px 16px rgba(255, 107, 53, 0.3);
+}
+
+.memberLoginBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(255, 107, 53, 0.4);
+}
+
+.driverLoginBtn {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+.driverLoginBtn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.loginIcon,
+.driverIcon {
+  flex-shrink: 0;
+}
+
+/* Bottom Bar */
+.footerBottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 2rem 0;
+  margin-top: 2rem;
+}
+
+.bottomContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.copyright {
+  color: #808080;
+  font-size: 14px;
+}
+
+.copyright p {
+  margin: 0;
+}
+
+.legalLinks {
+  display: flex;
+  gap: 2rem;
+}
+
+.legalLink {
+  color: #808080;
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.3s ease;
+}
+
+.legalLink:hover {
+  color: #FF6B35;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .footerMain {
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+  
+  .memberContent {
+    flex-direction: column;
+    text-align: center;
+    gap: 1.5rem;
+  }
+  
+  .memberActions {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .memberLoginBtn,
+  .driverLoginBtn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .footerContent {
+    padding: 0 1.5rem;
+  }
+  
+  .footerMain {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding: 3rem 0 2rem;
+  }
+  
+  .memberSection {
+    padding: 2rem;
+    margin: 1.5rem 0;
+  }
+  
+  .memberTitle {
+    font-size: 20px;
+  }
+  
+  .memberDescription {
+    font-size: 15px;
+  }
+  
+  .bottomContent {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+  
+  .legalLinks {
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .footerContent {
+    padding: 0 1rem;
+  }
+  
+  .footerMain {
+    padding: 2rem 0 1.5rem;
+  }
+  
+  .memberSection {
+    padding: 1.5rem;
+  }
+  
+  .memberTitle {
+    font-size: 18px;
+  }
+  
+  .memberDescription {
+    font-size: 14px;
+  }
+  
+  .memberLoginBtn,
+  .driverLoginBtn {
+    padding: 12px 20px;
+    font-size: 14px;
+  }
+  
+  .socialLinks {
+    gap: 12px;
+  }
+  
+  .socialLink {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .logoIcon {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+  
+  .logoText {
+    font-size: 24px;
+  }
+}
+
+/* Animation for member section */
+.memberSection {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Hover effects for better interactivity */
+.footerSection:hover .sectionTitle {
+  color: #FF6B35;
+  transition: color 0.3s ease;
+}
+
+.contactItem:hover {
+  color: #ffffff;
+  transform: translateX(4px);
+  transition: all 0.3s ease;
+}
+
+.contactItem:hover .contactIcon {
+  color: #FF8A65;
+  transition: color 0.3s ease;
+} 

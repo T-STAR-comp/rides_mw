@@ -1,0 +1,905 @@
+/* Driver Dashboard Styles */
+.driverDashboard {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  padding-bottom: 2rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Header */
+.header {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  color: white;
+  padding: 1.5rem 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.headerContent {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logoSection {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logoIcon {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #FF6B35, #FF8A65);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 24px;
+  box-shadow: 0 4px 16px rgba(255, 107, 53, 0.3);
+}
+
+.logoText {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0;
+  background: linear-gradient(135deg, #FF6B35, #FF8A65);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.changePasswordBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.changePasswordBtn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Driver Info Card */
+.driverInfoCard {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 2rem;
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.driverProfile {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.avatar {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #FF6B35, #FF8A65);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 32px;
+  box-shadow: 0 8px 24px rgba(255, 107, 53, 0.3);
+}
+
+.driverDetails h2 {
+  margin: 0 0 8px 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.vehicleInfo {
+  margin: 0 0 8px 0;
+  color: #666;
+  font-size: 16px;
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stars {
+  color: #FFD700;
+  font-size: 16px;
+}
+
+.ratingText {
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.stats {
+  display: flex;
+  gap: 2rem;
+}
+
+.statItem {
+  text-align: center;
+}
+
+.statValue {
+  display: block;
+  font-size: 24px;
+  font-weight: 700;
+  color: #FF6B35;
+  margin-bottom: 4px;
+}
+
+.statLabel {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+}
+
+/* Sections */
+.section {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 2rem;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.sectionTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.pickupCount {
+  background: linear-gradient(135deg, #FF6B35, #FF8A65);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Pickup Cards */
+.pickupList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.pickupCard {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pickupCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  border-color: #FF6B35;
+}
+
+.pickupHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.customerName {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 4px 0;
+}
+
+.pickupTime {
+  font-size: 14px;
+  color: #666;
+}
+
+.fareInfo {
+  text-align: right;
+}
+
+.fare {
+  display: block;
+  font-size: 20px;
+  font-weight: 700;
+  color: #FF6B35;
+  margin-bottom: 4px;
+}
+
+.distance {
+  font-size: 14px;
+  color: #666;
+}
+
+.pickupDetails {
+  margin-bottom: 1rem;
+}
+
+.locationInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.locationItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.locationLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: #666;
+  min-width: 40px;
+}
+
+.locationText {
+  font-size: 14px;
+  color: #1a1a1a;
+}
+
+.pickupActions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.7rem;
+}
+
+.acceptBtn {
+  background: #fff;
+  color: var(--orange, #FF6B35);
+  border: 1.5px solid var(--orange, #FF6B35);
+  border-radius: 12px;
+  padding: 0.5rem 1.3rem;
+  font-weight: 600;
+  font-size: 1rem;
+  margin-right: 0.5rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border 0.15s;
+}
+.acceptBtn:hover {
+  background: var(--orange, #FF6B35);
+  color: #fff;
+}
+
+.cancelBtn {
+  background: #e74c3c;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 0.5rem 1.3rem;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.cancelBtn:hover {
+  background: #c0392b;
+}
+
+/* History Cards */
+.historyList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.historyCard {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.historyHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.rideDate {
+  font-size: 14px;
+  color: #666;
+}
+
+.historyDetails {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.statusBadge {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.status {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.status.completed {
+  background: #e8f5e8;
+  color: #2e7d32;
+}
+
+.status.accepted {
+  background: #fff3e0;
+  color: #f57c00;
+}
+
+/* Modals */
+.modalBackdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(15px);
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.rideOptionsModal,
+.passwordModal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  width: 90%;
+  max-width: 480px;
+  z-index: 1001;
+  animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.modalTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.closeBtn {
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #666;
+}
+
+.closeBtn:hover {
+  background: rgba(0, 0, 0, 0.1);
+  color: #333;
+  transform: scale(1.05);
+}
+
+.rideDetails {
+  margin-bottom: 1.5rem;
+}
+
+.rideCustomer {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 1rem 0;
+}
+
+.rideInfo p {
+  margin: 0.5rem 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.rideInfo strong {
+  color: #1a1a1a;
+}
+
+.modalActions {
+  display: flex;
+  gap: 12px;
+}
+
+.acceptRideBtn,
+.savePasswordBtn {
+  flex: 1;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, #FF6B35, #FF8A65);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(255, 107, 53, 0.3);
+}
+
+.acceptRideBtn:hover,
+.savePasswordBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+}
+
+.cancelRideBtn,
+.cancelBtn {
+  flex: 1;
+  padding: 14px 20px;
+  background: rgba(0, 0, 0, 0.05);
+  color: #666;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.cancelRideBtn:hover,
+.cancelBtn:hover {
+  background: rgba(0, 0, 0, 0.1);
+  color: #333;
+}
+
+/* Password Form */
+.passwordForm {
+  margin-top: 1rem;
+}
+
+.formGroup {
+  margin-bottom: 1.5rem;
+}
+
+.formLabel {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+}
+
+.formInput {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid #f0f0f0;
+  border-radius: 12px;
+  font-size: 16px;
+  background: white;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.formInput:focus {
+  outline: none;
+  border-color: #FF6B35;
+  box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.1);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -60%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .header {
+    padding: 1rem;
+  }
+  
+  .headerContent {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .driverInfoCard {
+    flex-direction: column;
+    text-align: center;
+    margin: 1rem;
+    padding: 1.5rem;
+  }
+  
+  .stats {
+    justify-content: center;
+  }
+  
+  .section {
+    padding: 0 1rem;
+  }
+  
+  .pickupCard,
+  .historyCard {
+    padding: 1rem;
+  }
+  
+  .pickupHeader,
+  .historyHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .fareInfo {
+    text-align: left;
+  }
+  
+  .historyDetails {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .statusBadge {
+    justify-content: flex-start;
+  }
+  
+  .rideOptionsModal,
+  .passwordModal {
+    width: 95%;
+    padding: 1.5rem;
+  }
+  
+  .modalActions {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .logoText {
+    font-size: 20px;
+  }
+  
+  .avatar {
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+  }
+  
+  .driverDetails h2 {
+    font-size: 20px;
+  }
+  
+  .statValue {
+    font-size: 20px;
+  }
+  
+  .sectionTitle {
+    font-size: 18px;
+  }
+  
+  .customerName {
+    font-size: 16px;
+  }
+  
+  .fare {
+    font-size: 18px;
+  }
+}
+
+/* Header action buttons */
+.logoutBtn, .withdrawBtn {
+  background: var(--white, #fff);
+  color: var(--orange, #FF6B35);
+  border: 1.5px solid var(--orange, #FF6B35);
+  border-radius: 18px;
+  padding: 0.5rem 1.1rem;
+  font-weight: 600;
+  font-size: 1rem;
+  margin-left: 0.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background 0.15s, color 0.15s;
+}
+.logoutBtn:hover, .withdrawBtn:hover {
+  background: var(--orange, #FF6B35);
+  color: #fff;
+}
+
+/* Small withdraw button near balance */
+.withdrawBtnSmall {
+  background: none;
+  color: var(--orange, #FF6B35);
+  border: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin-top: 0.25rem;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
+.withdrawBtnSmall:hover {
+  color: #fff;
+  background: var(--orange, #FF6B35);
+  border-radius: 8px;
+}
+
+/* Modal backdrop */
+.modalBackdrop {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.18);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Modal base */
+.logoutModal, .withdrawModal {
+  background: #fff;
+  border-radius: 22px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.13);
+  padding: 2rem 1.5rem 1.5rem 1.5rem;
+  max-width: 95vw;
+  width: 350px;
+  z-index: 1010;
+  position: relative;
+  animation: modalPop 0.18s cubic-bezier(.4,1.4,.6,1) 1;
+}
+@keyframes modalPop {
+  0% { transform: scale(0.95) translateY(30px); opacity: 0; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+/* Modal header/title */
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.2rem;
+}
+.modalTitle {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-primary, #222);
+}
+
+/* Logout modal */
+.logoutMessage {
+  font-size: 1.08rem;
+  color: var(--text-secondary, #444);
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+/* Withdraw modal */
+.withdrawForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.formLabel {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-secondary, #444);
+}
+.formInput {
+  padding: 0.7rem 1rem;
+  border: 1.5px solid #e3e3e3;
+  border-radius: 12px;
+  font-size: 1rem;
+  background: #fafbfc;
+  color: #222;
+  outline: none;
+  transition: border 0.15s;
+}
+.formInput:focus {
+  border-color: var(--orange, #FF6B35);
+}
+
+/* Modal actions */
+.modalActions {
+  display: flex;
+  gap: 0.7rem;
+  margin-top: 1.2rem;
+  justify-content: flex-end;
+}
+.cancelBtn {
+  background: #f5f5f5;
+  color: #444;
+  border: none;
+  border-radius: 12px;
+  padding: 0.6rem 1.2rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.cancelBtn:hover {
+  background: #ececec;
+}
+
+/* Reuse logoutBtn/withdrawBtn for modal confirm buttons */
+.logoutBtn, .withdrawBtn {
+  min-width: 90px;
+}
+
+/* Feedback messages */
+.errorText {
+  color: #e74c3c;
+  font-size: 0.98rem;
+  margin-top: -0.5rem;
+  margin-bottom: 0.2rem;
+  text-align: left;
+}
+.successText {
+  color: #2ecc71;
+  font-size: 1.01rem;
+  margin-top: -0.5rem;
+  margin-bottom: 0.2rem;
+  text-align: left;
+}
+
+/* Responsive tweaks */
+@media (max-width: 500px) {
+  .logoutModal, .withdrawModal {
+    width: 98vw;
+    padding: 1.2rem 0.7rem 1rem 0.7rem;
+  }
+  .modalTitle {
+    font-size: 1.1rem;
+  }
+  .formInput {
+    font-size: 0.98rem;
+    padding: 0.6rem 0.7rem;
+  }
+  .modalActions {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: stretch;
+  }
+}
+
+.headerActions {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.settingsBtn {
+  background: var(--white, #fff);
+  color: var(--orange, #FF6B35);
+  border: 1.5px solid var(--orange, #FF6B35);
+  border-radius: 18px;
+  padding: 0.5rem 1.1rem;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background 0.15s, color 0.15s;
+}
+.settingsBtn:hover {
+  background: var(--orange, #FF6B35);
+  color: #fff;
+}
+
+.settingsModal {
+  background: #fff;
+  border-radius: 22px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.13);
+  padding: 2rem 1.5rem 1.5rem 1.5rem;
+  max-width: 95vw;
+  width: 350px;
+  z-index: 1010;
+  position: relative;
+  animation: modalPop 0.18s cubic-bezier(.4,1.4,.6,1) 1;
+}
+
+.settingsForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.saveBtn {
+  background: var(--orange, #FF6B35);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 0.6rem 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  min-width: 90px;
+  transition: background 0.15s;
+}
+.saveBtn:hover {
+  background: #ff8c4b;
+}
+
+@media (max-width: 500px) {
+  .headerActions {
+    gap: 0.3rem;
+  }
+  .settingsModal {
+    width: 98vw;
+    padding: 1.2rem 0.7rem 1rem 0.7rem;
+  }
+}

@@ -871,3 +871,356 @@ html {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--secondary-orange);
 }
+
+.logoutBtn {
+  background: linear-gradient(135deg, var(--primary-orange), var(--secondary-orange));
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 0.7rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(255, 107, 53, 0.12);
+  margin-left: 1rem;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+.logoutBtn:hover {
+  background: linear-gradient(135deg, var(--secondary-orange), var(--primary-orange));
+  box-shadow: 0 4px 16px rgba(255, 107, 53, 0.18);
+  transform: translateY(-1px);
+}
+
+.logoutModal {
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%) translateY(0);
+  background: rgba(255,255,255,0.98);
+  backdrop-filter: blur(20px);
+  border-radius: 24px 24px 0 0;
+  box-shadow: 0 -8px 32px rgba(0,0,0,0.18);
+  width: 95%;
+  max-width: 400px;
+  z-index: 1100;
+  padding: 2rem 1.5rem 1.5rem 1.5rem;
+  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1.2rem;
+  bottom: 2.5vh;
+}
+
+.logoutMessage {
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.logoutButton {
+  background: linear-gradient(135deg, #ff4444, #ff6b35);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 0.9rem 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  box-shadow: 0 2px 8px rgba(255, 68, 68, 0.12);
+  transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+.logoutButton:hover {
+  background: linear-gradient(135deg, #ff6b35, #ff4444);
+  box-shadow: 0 4px 16px rgba(255, 68, 68, 0.18);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 600px) {
+  .logoutModal {
+    max-width: 99vw;
+    padding: 1.2rem 0.7rem 1rem 0.7rem;
+  }
+  .logoutBtn {
+    padding: 0.6rem 1rem;
+    font-size: 0.95rem;
+  }
+}
+
+.trackBtn {
+  background: linear-gradient(135deg, var(--primary-orange), var(--secondary-orange));
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 0.7rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(255, 107, 53, 0.12);
+  margin-left: 1rem;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+.trackBtn:hover {
+  background: linear-gradient(135deg, var(--secondary-orange), var(--primary-orange));
+  box-shadow: 0 4px 16px rgba(255, 107, 53, 0.18);
+  transform: translateY(-1px);
+}
+
+.trackModal {
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%) translateY(0);
+  background: rgba(255,255,255,0.98);
+  backdrop-filter: blur(20px);
+  border-radius: 24px 24px 0 0;
+  box-shadow: 0 -8px 32px rgba(0,0,0,0.18);
+  width: 95%;
+  max-width: 420px;
+  z-index: 1100;
+  padding: 2rem 1.5rem 1.5rem 1.5rem;
+  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1.2rem;
+  bottom: 2.5vh;
+}
+
+.trackRideInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.trackDriverRow {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.trackDriverAvatar {
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, var(--primary-orange), var(--secondary-orange));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 700;
+  font-size: 2rem;
+  box-shadow: 0 4px 16px rgba(255, 107, 53, 0.18);
+}
+
+.trackDriverDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.trackDriverName {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.trackDriverCar {
+  font-size: 1rem;
+  color: #666;
+}
+
+.trackDriverEta {
+  font-size: 0.98rem;
+  color: var(--primary-orange);
+  font-weight: 600;
+}
+
+.trackRideStatusRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.trackRideStatus {
+  padding: 6px 18px;
+  border-radius: 20px;
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: capitalize;
+  background: #ffe0b2;
+  color: var(--primary-orange);
+  letter-spacing: 0.5px;
+}
+
+.on
+theway {
+  background: #ffe0b2;
+  color: var(--primary-orange);
+}
+.paid {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+.cancelled {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.trackRideFare {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary-orange);
+}
+
+.trackRideLocations {
+  font-size: 1rem;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.trackMapContainer {
+  width: 100%;
+  height: 120px;
+  border-radius: 16px;
+  background: #f5f5f5;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.trackMapPlaceholder {
+  color: #bbb;
+  font-size: 1.1rem;
+  font-weight: 500;
+  letter-spacing: 1px;
+}
+
+.payButton {
+  background: linear-gradient(135deg, #2e7d32, #43a047);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 0.9rem 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  box-shadow: 0 2px 8px rgba(46, 125, 50, 0.12);
+  transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+.payButton:hover {
+  background: linear-gradient(135deg, #43a047, #2e7d32);
+  box-shadow: 0 4px 16px rgba(46, 125, 50, 0.18);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 600px) {
+  .trackModal {
+    max-width: 99vw;
+    padding: 1.2rem 0.7rem 1rem 0.7rem;
+  }
+  .trackBtn {
+    padding: 0.6rem 1rem;
+    font-size: 0.95rem;
+  }
+  .trackDriverAvatar {
+    width: 44px;
+    height: 44px;
+    font-size: 1.2rem;
+  }
+}
+
+.successModalBackdrop {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s;
+}
+.successModal {
+  background: #fff;
+  border-radius: 24px;
+  box-shadow: 0 8px 32px rgba(46, 204, 113, 0.18);
+  padding: 2.5rem 2rem 2rem 2rem;
+  min-width: 320px;
+  max-width: 90vw;
+  text-align: center;
+  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2rem;
+}
+.successCheckmark {
+  margin-bottom: 0.5rem;
+  animation: popIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.successTitle {
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: #2ecc71;
+  margin-bottom: 0.2rem;
+}
+.successMessage {
+  font-size: 1.1rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+.successSummary {
+  background: #f5f5f5;
+  border-radius: 14px;
+  padding: 1rem 1.2rem;
+  font-size: 1rem;
+  color: #222;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-top: 0.5rem;
+}
+@keyframes popIn {
+  0% { transform: scale(0.7); opacity: 0; }
+  80% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+@media (max-width: 600px) {
+  .successModal {
+    min-width: 0;
+    padding: 1.2rem 0.7rem 1rem 0.7rem;
+  }
+  .successSummary {
+    padding: 0.7rem 0.5rem;
+    font-size: 0.97rem;
+  }
+}
+
+.noBookingMsg {
+  text-align: center;
+  color: #888;
+  font-size: 1.15rem;
+  padding: 2rem 0 1.5rem 0;
+  font-weight: 500;
+}
+
+.priceInfo {
+  margin: 1rem 0 0.5rem 0;
+  font-size: 1.08rem;
+  color: var(--primary-orange);
+  font-weight: 600;
+  text-align: center;
+  background: #fff7ed;
+  border-radius: 10px;
+  padding: 0.5rem 1rem;
+  box-shadow: 0 2px 8px rgba(255, 107, 53, 0.07);
+}
