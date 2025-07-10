@@ -1224,3 +1224,71 @@ theway {
   padding: 0.5rem 1rem;
   box-shadow: 0 2px 8px rgba(255, 107, 53, 0.07);
 }
+
+.inprogress {
+  background: #a8e6b1;
+  color: #207744;
+  border-radius: 8px;
+  padding: 0.3em 0.9em;
+  font-weight: 600;
+  font-size: 1em;
+  letter-spacing: 0.03em;
+  display: inline-block;
+}
+
+.mapsBtn {
+  background: #4285f4;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.32em 1em;
+  font-size: 0.98em;
+  font-weight: 500;
+  margin-left: 1em;
+  text-decoration: none;
+  transition: background 0.15s;
+  box-shadow: 0 1px 4px rgba(66,133,244,0.08);
+  display: inline-block;
+}
+.mapsBtn:hover {
+  background: #3367d6;
+}
+
+.callBtn {
+  background: #34c759;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.32em 1em;
+  font-size: 0.98em;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background 0.15s;
+  box-shadow: 0 1px 4px rgba(52,199,89,0.08);
+  display: inline-block;
+}
+.callBtn:hover {
+  background: #1eae4b;
+}
+
+.paymentStatusMsg {
+  color: #207744;
+  font-weight: 500;
+  margin-top: 0.7em;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  font-size: 1.05em;
+}
+.paymentSuccessMsg {
+  color: #2ecc71;
+  font-weight: 600;
+  margin-top: 0.7em;
+  font-size: 1.08em;
+}
+.paymentErrorMsg {
+  color: #e74c3c;
+  font-weight: 500;
+  margin-top: 0.7em;
+  font-size: 1.05em;
+}

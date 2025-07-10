@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './Home/Home';
 import DriverComp from './members/driverComp/driverComp';
 import LandingPage from './landing/landingPage';
+import PaymentFailed from './components/PaymentFailed';
 
 function App() {
 
@@ -10,6 +11,7 @@ function App() {
     return (
       <Routes>
         <Route path='/' element={<Home/>} />
+        <Route path='/paymentstatus' element={<PaymentFailed/>} />
       </Routes>
     );
   }
@@ -24,7 +26,6 @@ function App() {
 
   return (
       <Routes>
-        <Route path='l' element={<DriverComp/>} />
         <Route path='/' element={<LandingPage/>} />
       </Routes>
   );

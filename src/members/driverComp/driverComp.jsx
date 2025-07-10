@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import styles from './styles/driverComp.module.css';
 import { postDriverLocation } from './driverLocationApi';
 import { connectRideSocket } from '../../Home/rideSocket';
+import { postDriverResponse } from './driverResponseApi';
+import MapModal from '../../components/MapModal';
 
 const DriverComp = () => {
   const [driverData, setDriverData] = useState({
@@ -34,24 +36,34 @@ const DriverComp = () => {
   const [settingsError, setSettingsError] = useState('');
   const [settingsSuccess, setSettingsSuccess] = useState(false);
   const [driverLocation, setDriverLocation] = useState(null);
+  const [loadingBookingId, setLoadingBookingId] = useState(null);
+  const [showMapModal, setShowMapModal] = useState(false);
+  const [mapModalOrigin, setMapModalOrigin] = useState(null);
+  const [mapModalDestination, setMapModalDestination] = useState(null);
+  const [mapModalTitle, setMapModalTitle] = useState('');
 
-  const handleAcceptRide = (rideId) => {
-    setNewPickups(prev => prev.filter(ride => ride.id !== rideId));
-    // Add to history with 'accepted' status
-    const acceptedRide = newPickups.find(ride => ride.id === rideId);
-    if (acceptedRide) {
-      setPickupHistory(prev => [{
-        ...acceptedRide,
-        status: 'accepted',
-        date: new Date().toLocaleString()
-      }, ...prev]);
+  const handleAcceptRide = async (rideId) => {
+    setLoadingBookingId(rideId);
+    try {
+      await postDriverResponse({ id: rideId, status: 'inprogress' });
+      setNewPickups(prev => prev.map(ride => ride.id === rideId ? { ...ride, status: 'inprogress' } : ride));
+    } catch (err) {
+      // Optionally show error to user
     }
+    setLoadingBookingId(null);
   };
 
-  const handleCancelRide = (rideId) => {
-    setNewPickups(prev => prev.filter(ride => ride.id !== rideId));
-    setShowRideOptions(false);
-    setSelectedRide(null);
+  const handleCancelRide = async (rideId) => {
+    setLoadingBookingId(rideId);
+    try {
+      await postDriverResponse({ id: rideId, status: 'cancelled' });
+      setNewPickups(prev => prev.filter(ride => ride.id !== rideId));
+      setShowRideOptions(false);
+      setSelectedRide(null);
+    } catch (err) {
+      // Optionally show error to user
+    }
+    setLoadingBookingId(null);
   };
 
   const handleRideClick = (ride) => {
@@ -159,8 +171,8 @@ const DriverComp = () => {
   }, []);
 
   useEffect(() => {
-    if (driverLocation && driverLocation.lat && driverLocation.lng) {
-      const email = sessionStorage.getItem('driverEmail');
+      if (driverLocation && driverLocation.lat && driverLocation.lng) {
+          const email = sessionStorage.getItem('driverEmail');
       if (email) {
         postDriverLocation({ lat: driverLocation.lat, lng: driverLocation.lng, email })
           .catch((err) => {
@@ -176,6 +188,7 @@ const DriverComp = () => {
     const ws = connectRideSocket({
       onBooking: (data) => {
         // Use only the backend bookings array
+        console.log(data.bookings)
         if (data && Array.isArray(data.bookings)) {
           setNewPickups(data.bookings);
         }
@@ -185,6 +198,10 @@ const DriverComp = () => {
       if (ws && ws.readyState === 1) ws.close();
     };
   }, []);
+
+  // Filter bookings by status
+  const newPickupBookings = newPickups.filter(b => b.status === 'active');
+  const inProgressBookings = newPickups.filter(b => b.status === 'inprogress');
 
   return (
     <div className={styles.driverDashboard}>
@@ -252,10 +269,10 @@ const DriverComp = () => {
       <section className={styles.section}>
         <div className={styles.sectionHeader}>
           <h3 className={styles.sectionTitle}>New Pickup Requests</h3>
-          <span className={styles.pickupCount}>{newPickups.length} available</span>
+          <span className={styles.pickupCount}>{newPickupBookings.length} available</span>
         </div>
         <div className={styles.pickupList}>
-          {newPickups.map((booking) => (
+          {newPickupBookings.map((booking) => (
             <div key={booking.id} className={styles.pickupCard} onClick={() => handleRideClick(booking)}>
               <div className={styles.pickupHeader}>
                 <div className={styles.customerInfo}>
@@ -281,28 +298,101 @@ const DriverComp = () => {
               </div>
               <div className={styles.pickupActions}>
                 <button
-                  className={styles.acceptBtn}
-                  onClick={e => {
-                    e.stopPropagation();
-                    handleAcceptRide(booking.id);
-                  }}
-                >
-                  Accept
-                </button>
-                <button
                   className={styles.cancelBtn}
+                  disabled={loadingBookingId === booking.id}
                   onClick={e => {
                     e.stopPropagation();
                     handleCancelRide(booking.id);
                   }}
                 >
-                  Cancel
+                  {loadingBookingId === booking.id ? 'Cancelling...' : 'Cancel'}
+                </button>
+                <button
+                  className={styles.acceptBtn}
+                  disabled={loadingBookingId === booking.id}
+                  onClick={e => {
+                    e.stopPropagation();
+                    handleAcceptRide(booking.id);
+                  }}
+                >
+                  {loadingBookingId === booking.id ? 'Accepting...' : 'Accept'}
                 </button>
               </div>
             </div>
           ))}
         </div>
       </section>
+
+      {/* In Progress Section */}
+      {inProgressBookings.length > 0 && (
+        <section className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <h3 className={styles.sectionTitle}>Current Ride</h3>
+          </div>
+          <div className={styles.pickupList}>
+            {inProgressBookings.map((booking) => (
+              <div key={booking.id} className={styles.pickupCard}>
+                <div className={styles.pickupHeader}>
+                  <div className={styles.customerInfo}>
+                    <h4 className={styles.customerName}>{booking.phone_number}</h4>
+                    <span className={styles.pickupTime}>{booking.created_at ? new Date(booking.created_at).toLocaleString() : ''}</span>
+                  </div>
+                  <div className={styles.fareInfo}>
+                    <span className={styles.fare}>{formatCurrency(booking.price)}</span>
+                    <span className={styles.distance}>{booking.current_location_name || `${booking.current_lat}, ${booking.current_lng}`}</span>
+                  </div>
+                </div>
+                <div className={styles.pickupDetails}>
+                  <div className={styles.locationInfo}>
+                    <div className={styles.locationItem}>
+                      <span className={styles.locationLabel}>From:</span>
+                      <span className={styles.locationText}>{booking.current_location_name || `${booking.current_lat}, ${booking.current_lng}`}</span>
+                    </div>
+                    <div className={styles.locationItem}>
+                      <span className={styles.locationLabel}>To:</span>
+                      <span className={styles.locationText}>{booking.destination_name || `${booking.destination_lat}, ${booking.destination_lng}`}</span>
+                    </div>
+                  </div>
+                </div>
+                <div className={styles.pickupActions}>
+                  <button className={styles.inProgressBtn} disabled>
+                    In Progress
+                  </button>
+                  <button
+                    className={styles.mapsBtn}
+                    onClick={() => {
+                      setMapModalOrigin(driverLocation ? { lat: driverLocation.lat, lng: driverLocation.lng } : null);
+                      setMapModalDestination({ lat: booking.current_lat, lng: booking.current_lng });
+                      setMapModalTitle('Route to Pickup');
+                      setShowMapModal(true);
+                    }}
+                  >
+                    View in Maps
+                  </button>
+                  <button
+                    className={styles.destinationBtn}
+                    onClick={() => {
+                      setMapModalOrigin(driverLocation ? { lat: driverLocation.lat, lng: driverLocation.lng } : null);
+                      setMapModalDestination({ lat: booking.destination_lat, lng: booking.destination_lng });
+                      setMapModalTitle('Route to Destination');
+                      setShowMapModal(true);
+                    }}
+                  >
+                    View Destination in Maps
+                  </button>
+                  <a
+                    className={styles.callBtn}
+                    href={`tel:${booking.phone_number}`}
+                    style={{ marginLeft: '0.7em' }}
+                  >
+                    Call
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Pickup History Section */}
       <section className={styles.section}>
@@ -539,6 +629,14 @@ const DriverComp = () => {
           </div>
         </div>
       )}
+
+      <MapModal
+        open={showMapModal}
+        onClose={() => setShowMapModal(false)}
+        origin={mapModalOrigin}
+        destination={mapModalDestination}
+        title={mapModalTitle}
+      />
     </div>
   );
 };

@@ -7,6 +7,9 @@ import { requestRide, cancelRide } from '../api/rideApi';
 import { connectRideSocket } from './rideSocket';
 import { getDistanceKm, getRidePrice } from '../utils/distance';
 import { fetchNearRides } from '../api/fetchNearRides';
+import PayModule from '../api/PayModule';
+import FetchPayStatus from '../api/FetchPayStatus';
+import MapModal from '../components/MapModal';
 
 const mapContainerStyle = {
   width: '100%',
@@ -69,6 +72,21 @@ const Home = () => {
   const [cancelError, setCancelError] = useState('');
   const [distanceKm, setDistanceKm] = useState(null);
   const [calculatedPrice, setCalculatedPrice] = useState(null);
+  const [bookingLoading, setBookingLoading] = useState(false);
+  const [cancelLoading, setCancelLoading] = useState(false);
+  const [payLoading, setPayLoading] = useState(false);
+  const [paymentVerifying, setPaymentVerifying] = useState(false);
+  const [paymentError, setPaymentError] = useState('');
+  const [paymentErrorType, setPaymentErrorType] = useState(''); // 'init' or 'status'
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const paymentSuccessTimeoutRef = useRef(null);
+  const [showPaymentResultModal, setShowPaymentResultModal] = useState(false);
+  const [paymentResult, setPaymentResult] = useState(''); // 'success' | 'failure'
+  const [paymentResultMessage, setPaymentResultMessage] = useState('');
+  const [showMapModal, setShowMapModal] = useState(false);
+  const [mapModalOrigin, setMapModalOrigin] = useState(null);
+  const [mapModalDestination, setMapModalDestination] = useState(null);
+  const [mapModalTitle, setMapModalTitle] = useState('');
 
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: 'AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8',
@@ -229,14 +247,13 @@ const Home = () => {
       alert('Please select a ride first!');
       return;
     }
-
+    setBookingLoading(true);
     // Prepare data for ride request
     const pickup = userLocation;
     const destination = marker;
     const driver = selectedRide.driver;
     const price = calculatedPrice ?? selectedRide.price;
     const phone = formData.phone;
-
     try {
       const response = await requestRide({ pickup, destination, driver, price, phone });
       setShowModal(false);
@@ -258,6 +275,7 @@ const Home = () => {
     } catch (err) {
       alert('Failed to book ride: ' + err.message);
     }
+    setBookingLoading(false);
   };
 
   const getDriverInitials = (name) => {
@@ -290,22 +308,49 @@ const Home = () => {
   const handleCancelRide = async () => {
     if (!currentBooking) return;
     setTrackRideLoading(true);
+    setCancelLoading(true);
     setCancelError('');
     try {
       await cancelRide({ id: currentBooking.id });
       setTrackRideStatus('cancelled');
+      setTimeout(() => {
+        window.location.reload();
+      }, 600); // Give a short delay for feedback
     } catch (err) {
       setCancelError(err.message || 'Failed to cancel ride');
     } finally {
       setTrackRideLoading(false);
+      setCancelLoading(false);
     }
   };
-  const handlePayNow = () => {
+  const handlePayNow = async () => {
     setTrackRideLoading(true);
-    setTimeout(() => {
-      setTrackRideStatus('paid');
-      setTrackRideLoading(false);
-    }, 1200);
+    setPayLoading(true);
+    setPaymentError('');
+    setPaymentErrorType('');
+    try {
+      const email = sessionStorage.getItem('userEmail');
+      const amount = currentRide.fare;
+      const callback = window.location.origin;
+      const return_url = window.location.origin + "/paymentstatus";
+      const result = await PayModule(email, amount, callback, return_url);
+      if (result && result.status === 'ok' && result.checkout_url) {
+        window.location.href = result.checkout_url;
+      } else {
+        setTrackRideStatus('paid');
+        setPaymentResult('success');
+        setPaymentResultMessage('Payment successful!');
+        setShowPaymentResultModal(true);
+      }
+    } catch (err) {
+      setPaymentError('Network error. Please check your connection and try again.');
+      setPaymentErrorType('init');
+      setPaymentResult('failure');
+      setPaymentResultMessage('Network error. Please check your connection and try again.');
+      setShowPaymentResultModal(true);
+    }
+    setTrackRideLoading(false);
+    setPayLoading(false);
   };
 
   // Example current ride data (replace with real data as needed)
@@ -355,6 +400,53 @@ const Home = () => {
       setCalculatedPrice(null);
     }
   }, [userLocation, marker, selectedRide]);
+
+  useEffect(() => {
+    const checkPayment = async () => {
+      const transId = sessionStorage.getItem('Trans_Id');
+      if (transId && currentBooking && currentBooking.id) {
+        setPaymentVerifying(true);
+        setPaymentError('');
+        setPaymentErrorType('');
+        try {
+          const result = await FetchPayStatus(currentBooking.id);
+          if (result && result.status === 'ok') {
+            setTrackRideStatus('paid');
+            setPaymentSuccess(true);
+            sessionStorage.removeItem('Trans_Id');
+            if (paymentSuccessTimeoutRef.current) clearTimeout(paymentSuccessTimeoutRef.current);
+            paymentSuccessTimeoutRef.current = setTimeout(() => setPaymentSuccess(false), 10000);
+            setPaymentResult('success');
+            setPaymentResultMessage('Payment successful!');
+            setShowPaymentResultModal(true);
+          } else if (result && result.error) {
+            setPaymentError(result.error);
+            setPaymentErrorType('status');
+            setPaymentResult('failure');
+            setPaymentResultMessage(result.error);
+            setShowPaymentResultModal(true);
+          } else {
+            setPaymentError('Payment not completed yet.');
+            setPaymentErrorType('status');
+          }
+        } catch (err) {
+          setPaymentError('Network error. Please check your connection and try again.');
+          setPaymentErrorType('status');
+          setPaymentResult('failure');
+          setPaymentResultMessage('Network error. Please check your connection and try again.');
+          setShowPaymentResultModal(true);
+        }
+        setPaymentVerifying(false);
+      }
+    };
+    checkPayment();
+    // Optionally, poll every X seconds:
+    // const interval = setInterval(checkPayment, 5000);
+    // return () => clearInterval(interval);
+    return () => {
+      if (paymentSuccessTimeoutRef.current) clearTimeout(paymentSuccessTimeoutRef.current);
+    };
+  }, [currentBooking]);
 
   return (
     <div className={styles.container}>
@@ -740,9 +832,16 @@ const Home = () => {
               <button
                 type="submit"
                 className={styles.submitButton}
-                disabled={!selectedRide || !marker}
+                disabled={!selectedRide || !marker || bookingLoading}
               >
-                {selectedRide ? `Book with ${selectedRide.driver.name}` : 'Select a ride first'}
+                {bookingLoading ? (
+                  <>
+                    <div className={styles.spinner} />
+                    Booking...
+                  </>
+                ) : (
+                  selectedRide ? `Book with ${selectedRide.driver.name}` : 'Select a ride first'
+                )}
               </button>
             </form>
             
@@ -802,8 +901,24 @@ const Home = () => {
                 </div>
                 <div className={styles.trackRideStatusRow}>
                   <span className={styles.trackRideStatus + ' ' + styles[currentRide.status.replace(/\s/g, '')]}>{currentRide.status}</span>
-                  <span className={styles.trackRideFare}>{currentRide.fare.toLocaleString()} {currentRide.currency}</span>
                 </div>
+                {currentRide.status === 'inprogress' && (
+                  <div className={styles.onTheWayMsg}>
+                    <span className={styles.onTheWayIcon}>🚗</span>
+                    <span className={styles.onTheWayText}>Your driver is on the way</span>
+                    <button
+                      className={styles.mapsBtn}
+                      onClick={() => {
+                        setMapModalOrigin({ lat: currentRide.mapCenter.lat, lng: currentRide.mapCenter.lng });
+                        setMapModalDestination(null);
+                        setMapModalTitle('Your Location');
+                        setShowMapModal(true);
+                      }}
+                    >
+                      View in Maps
+                    </button>
+                  </div>
+                )}
                 <div className={styles.trackRideLocations}>
                   <div><strong>From:</strong> {currentRide.pickup}</div>
                   <div><strong>To:</strong> {currentRide.destination}</div>
@@ -814,12 +929,72 @@ const Home = () => {
             )}
             {currentBooking && (
               <div className={styles.modalActions}>
-                <button className={styles.cancelButton} onClick={handleCancelRide} disabled={trackRideLoading || currentRide.status === 'cancelled' || currentRide.status === 'paid'}>
-                  {trackRideLoading && currentRide.status !== 'paid' && currentRide.status !== 'cancelled' ? 'Cancelling...' : 'Cancel Ride'}
+                <button className={styles.cancelButton} onClick={handleCancelRide} disabled={trackRideLoading || cancelLoading || currentRide.status === 'cancelled' || currentRide.status === 'paid'}>
+                  {cancelLoading ? 'Cancelling...' : 'Cancel Ride'}
                 </button>
-                <button className={styles.payButton} onClick={handlePayNow} disabled={trackRideLoading || currentRide.status === 'paid' || currentRide.status === 'cancelled'}>
-                  {trackRideLoading && currentRide.status !== 'paid' && currentRide.status !== 'cancelled' ? 'Processing...' : currentRide.status === 'paid' ? 'Paid' : 'Pay Now'}
-                </button>
+                {currentRide.status === 'inprogress' && !paymentSuccess && (
+                  <button className={styles.payButton} onClick={handlePayNow} disabled={trackRideLoading || payLoading || paymentVerifying || currentRide.status === 'paid' || currentRide.status === 'cancelled'}>
+                    {payLoading ? 'Processing...' : paymentVerifying ? 'Verifying...' : currentRide.status === 'paid' ? 'Paid' : 'Pay Now'}
+                  </button>
+                )}
+                {paymentVerifying && (
+                  <div className={styles.paymentStatusMsg}><span className={styles.spinner} /> Verifying payment...</div>
+                )}
+                {paymentSuccess && (
+                  <div className={styles.paymentSuccessMsg}>
+                    Payment successful! 🎉
+                    <button
+                      className={styles.backButton}
+                      style={{ marginLeft: 16, marginTop: 12, padding: '8px 20px', borderRadius: 8, background: '#FF6B35', color: '#fff', border: 'none', fontWeight: 600, fontSize: 16, cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
+                      onClick={() => {
+                        if (paymentSuccessTimeoutRef.current) clearTimeout(paymentSuccessTimeoutRef.current);
+                        setPaymentSuccess(false);
+                      }}
+                    >
+                      Back
+                    </button>
+                  </div>
+                )}
+                {paymentError && (
+                  <div className={styles.paymentErrorMsg}>
+                    {paymentError}
+                    <button
+                      className={styles.retryButton}
+                      style={{ marginLeft: 12, marginTop: 10, padding: '7px 18px', borderRadius: 8, background: '#FF6B35', color: '#fff', border: 'none', fontWeight: 600, fontSize: 15, cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
+                      onClick={async () => {
+                        setPaymentError('');
+                        setPaymentErrorType('');
+                        if (paymentErrorType === 'init') {
+                          await handlePayNow();
+                        } else if (paymentErrorType === 'status') {
+                          setPaymentVerifying(true);
+                          try {
+                            const result = await FetchPayStatus(currentBooking.id);
+                            if (result && result.status === 'ok') {
+                              setTrackRideStatus('paid');
+                              setPaymentSuccess(true);
+                              sessionStorage.removeItem('Trans_Id');
+                              if (paymentSuccessTimeoutRef.current) clearTimeout(paymentSuccessTimeoutRef.current);
+                              paymentSuccessTimeoutRef.current = setTimeout(() => setPaymentSuccess(false), 10000);
+                            } else if (result && result.error) {
+                              setPaymentError(result.error);
+                              setPaymentErrorType('status');
+                            } else {
+                              setPaymentError('Payment not completed yet.');
+                              setPaymentErrorType('status');
+                            }
+                          } catch (err) {
+                            setPaymentError('Network error. Please check your connection and try again.');
+                            setPaymentErrorType('status');
+                          }
+                          setPaymentVerifying(false);
+                        }
+                      }}
+                    >
+                      Retry
+                    </button>
+                  </div>
+                )}
               </div>
             )}
             {cancelError && <div className={styles.errorText}>{cancelError}</div>}
@@ -849,6 +1024,96 @@ const Home = () => {
         </div>
       )}
 
+      {/* Payment Result Modal */}
+      {showPaymentResultModal && (
+        <div className={styles.paymentResultModalBackdrop}>
+          <div className={styles.paymentResultModal}>
+            <div className={styles.paymentResultIcon}>
+              {paymentResult === 'success' ? (
+                <svg width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="28" cy="28" r="28" fill="#2ecc71"/>
+                  <path d="M16 29.5L25 38L40 21" stroke="#fff" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              ) : (
+                <svg width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="28" cy="28" r="28" fill="#e74c3c"/>
+                  <path d="M20 20L36 36M36 20L20 36" stroke="#fff" strokeWidth="4" strokeLinecap="round"/>
+                </svg>
+              )}
+            </div>
+            <h2 className={styles.paymentResultTitle}>{paymentResult === 'success' ? 'Payment Successful' : 'Payment Failed'}</h2>
+            <div className={styles.paymentResultMessage}>{paymentResultMessage}</div>
+            <div className={styles.paymentResultActions}>
+              {paymentResult === 'failure' && (
+                <button
+                  className={styles.retryButton}
+                  onClick={async () => {
+                    setShowPaymentResultModal(false);
+                    setPaymentError('');
+                    setPaymentErrorType('');
+                    setPaymentResult('');
+                    setPaymentResultMessage('');
+                    if (paymentErrorType === 'init') {
+                      await handlePayNow();
+                    } else if (paymentErrorType === 'status') {
+                      setPaymentVerifying(true);
+                      try {
+                        const result = await FetchPayStatus(currentBooking.id);
+                        if (result && result.status === 'ok') {
+                          setTrackRideStatus('paid');
+                          setPaymentSuccess(true);
+                          sessionStorage.removeItem('Trans_Id');
+                          if (paymentSuccessTimeoutRef.current) clearTimeout(paymentSuccessTimeoutRef.current);
+                          paymentSuccessTimeoutRef.current = setTimeout(() => setPaymentSuccess(false), 10000);
+                          setPaymentResult('success');
+                          setPaymentResultMessage('Payment successful!');
+                          setShowPaymentResultModal(true);
+                        } else if (result && result.error) {
+                          setPaymentError(result.error);
+                          setPaymentErrorType('status');
+                          setPaymentResult('failure');
+                          setPaymentResultMessage(result.error);
+                          setShowPaymentResultModal(true);
+                        } else {
+                          setPaymentError('Payment not completed yet.');
+                          setPaymentErrorType('status');
+                        }
+                      } catch (err) {
+                        setPaymentError('Network error. Please check your connection and try again.');
+                        setPaymentErrorType('status');
+                        setPaymentResult('failure');
+                        setPaymentResultMessage('Network error. Please check your connection and try again.');
+                        setShowPaymentResultModal(true);
+                      }
+                      setPaymentVerifying(false);
+                    }
+                  }}
+                >
+                  Retry
+                </button>
+              )}
+              <button
+                className={styles.backButton}
+                onClick={() => {
+                  setShowPaymentResultModal(false);
+                  setPaymentResult('');
+                  setPaymentResultMessage('');
+                }}
+              >
+                {paymentResult === 'success' ? 'Back' : 'Close'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Map Modal */}
+      <MapModal
+        open={showMapModal}
+        onClose={() => setShowMapModal(false)}
+        origin={mapModalOrigin}
+        destination={mapModalDestination}
+        title={mapModalTitle}
+      />
       {/* Footer */}
       <Footer />
     </div>
