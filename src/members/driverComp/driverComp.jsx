@@ -10,7 +10,6 @@ const DriverComp = () => {
     name: sessionStorage.getItem('driverLogged'),
     balance: parseFloat(sessionStorage.getItem('driverBalance')),
     rating: sessionStorage.getItem('driverRating'),
-    totalRides: null,
     vehicle: sessionStorage.getItem('driverCar'),
     plate: sessionStorage.getItem('driverPlate')
   });
@@ -202,6 +201,12 @@ const DriverComp = () => {
   // Filter bookings by status
   const newPickupBookings = newPickups.filter(b => b.status === 'active');
   const inProgressBookings = newPickups.filter(b => b.status === 'inprogress');
+  const recentBookings = newPickups
+    .filter(b => b.status === 'cancelled' || b.status === 'complete')
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+  // Compute total completed rides
+  const totalRides = newPickups.filter(b => b.status === 'complete').length;
 
   return (
     <div className={styles.driverDashboard}>
@@ -259,7 +264,7 @@ const DriverComp = () => {
             </button>
           </div>
           <div className={styles.statItem}>
-            <span className={styles.statValue}>{driverData.totalRides}</span>
+            <span className={styles.statValue}>{totalRides}</span>
             <span className={styles.statLabel}>Total Rides</span>
           </div>
         </div>
@@ -399,36 +404,33 @@ const DriverComp = () => {
         <div className={styles.sectionHeader}>
           <h3 className={styles.sectionTitle}>Recent Rides</h3>
         </div>
-        
         <div className={styles.historyList}>
-          {pickupHistory.map((ride) => (
-            <div key={ride.id} className={styles.historyCard}>
+          {recentBookings.length === 0 && <div style={{ color: '#888', padding: '1.2em 0' }}>No recent rides yet.</div>}
+          {recentBookings.map((ride) => (
+            <div key={ride.id} className={`${styles.historyCard} ${styles.faded}`}>
               <div className={styles.historyHeader}>
                 <div className={styles.customerInfo}>
-                  <h4 className={styles.customerName}>{ride.customerName}</h4>
-                  <span className={styles.rideDate}>{ride.date}</span>
+                  <h4 className={styles.customerName}>{ride.phone_number}</h4>
+                  <span className={styles.rideDate}>{ride.created_at ? new Date(ride.created_at).toLocaleString() : ''}</span>
                 </div>
                 <div className={styles.fareInfo}>
-                  <span className={styles.fare}>{formatCurrency(ride.fare)}</span>
-                  <span className={styles.distance}>{ride.distance}</span>
+                  <span className={styles.fare}>{formatCurrency(ride.price)}</span>
+                  <span className={styles.distance}>{ride.current_location_name || `${ride.current_lat}, ${ride.current_lng}`}</span>
                 </div>
               </div>
-              
               <div className={styles.historyDetails}>
                 <div className={styles.locationInfo}>
                   <div className={styles.locationItem}>
                     <span className={styles.locationLabel}>From:</span>
-                    <span className={styles.locationText}>{ride.pickupLocation}</span>
+                    <span className={styles.locationText}>{ride.current_location_name || `${ride.current_lat}, ${ride.current_lng}`}</span>
                   </div>
                   <div className={styles.locationItem}>
                     <span className={styles.locationLabel}>To:</span>
-                    <span className={styles.locationText}>{ride.destination}</span>
+                    <span className={styles.locationText}>{ride.destination_name || `${ride.destination_lat}, ${ride.destination_lng}`}</span>
                   </div>
                 </div>
                 <div className={styles.statusBadge}>
-                  <span className={`${styles.status} ${styles[ride.status]}`}>
-                    {ride.status}
-                  </span>
+                  <span className={`${styles.status} ${styles[ride.status]}`}>{ride.status}</span>
                 </div>
               </div>
             </div>

@@ -335,6 +335,12 @@
   border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
+.historyCard.faded {
+  background: #f7f7f7;
+  opacity: 0.7;
+  filter: grayscale(0.2);
+}
+
 .historyHeader {
   display: flex;
   align-items: center;
@@ -359,21 +365,25 @@
 }
 
 .status {
-  padding: 4px 12px;
+  padding: 6px 18px;
   border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 1.1em;
+  font-weight: 700;
   text-transform: capitalize;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 
-.status.completed {
+.status.complete {
   background: #e8f5e8;
-  color: #2e7d32;
+  color: #219150;
+  border: 1.5px solid #2ecc71;
 }
 
-.status.accepted {
-  background: #fff3e0;
-  color: #f57c00;
+.status.cancelled {
+  background: #fff0f0;
+  color: #e74c3c;
+  border: 1.5px solid #e74c3c;
 }
 
 /* Modals */
