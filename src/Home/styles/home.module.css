@@ -1292,3 +1292,85 @@ theway {
   margin-top: 0.7em;
   font-size: 1.05em;
 }
+
+.desktopActions {
+  display: flex;
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .desktopActions {
+    display: none;
+  }
+}
+
+.bottomNav {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .bottomNav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1200;
+    background: rgba(255,255,255,0.98);
+    box-shadow: 0 -4px 24px rgba(255,107,53,0.10);
+    border-top: 1px solid #f5f5f5;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0.5rem 0;
+    height: 68px;
+    backdrop-filter: blur(16px);
+    border-radius: 18px 18px 0 0;
+    /* Remove max-width and centering for full width */
+    margin: 0;
+    max-width: none;
+    left: 0;
+    right: 0;
+    transform: none;
+  }
+  .bottomNavBtn {
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--primary-orange);
+    font-size: 0.98rem;
+    font-weight: 600;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    cursor: pointer;
+    flex: 1;
+    transition: background 0.18s, color 0.18s;
+    border-radius: 12px;
+    padding: 6px 0 2px 0;
+    min-width: 80px;
+  }
+  .bottomNavBtn:active, .bottomNavBtn:focus {
+    background: var(--light-orange);
+    color: var(--secondary-orange);
+  }
+  .bottomNavBtn svg {
+    width: 26px;
+    height: 26px;
+    margin-bottom: 2px;
+    display: block;
+    fill: var(--primary-orange);
+    transition: fill 0.18s;
+  }
+  .bottomNavBtn:active svg, .bottomNavBtn:focus svg {
+    fill: var(--secondary-orange);
+  }
+}
+
+@media (max-width: 768px) {
+  .logoutModal,
+  .trackModal {
+    margin-bottom: 80px;
+  }
+}

@@ -11,11 +11,11 @@ export default defineConfig({
       manifest: {
         id: '/',
         name: 'Rides MW',
-        short_name: 'Rides',
+        short_name: 'Rides MW',
         start_url: '.',
         display: 'standalone',
         background_color: '#ffffff',
-        theme_color: '#42b983',
+        theme_color: '#ffffff',
         icons: [
           {
             src: 'icon-192x192.png',
