@@ -300,3 +300,31 @@
   text-align: center;
   font-weight: 600;
 }
+
+.membersLoginLabel {
+  text-align: center;
+  color: var(--primary-orange);
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.5px;
+}
+
+.membersLoginBtn {
+  display: block;
+  margin: 0 auto 0.7rem auto;
+  background: linear-gradient(135deg, var(--primary-orange), var(--secondary-orange));
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.08rem;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 28px;
+  box-shadow: 0 2px 8px rgba(255, 107, 53, 0.13);
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.membersLoginBtn:hover {
+  background: linear-gradient(135deg, var(--secondary-orange), var(--primary-orange));
+  box-shadow: 0 4px 16px rgba(255, 107, 53, 0.18);
+}

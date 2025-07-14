@@ -26,7 +26,7 @@ function App() {
 
   return (
       <Routes>
-        <Route path='/' element={<DriverComp/>} />
+        <Route path='/' element={<LandingPage/>} />
       </Routes>
   );
 }

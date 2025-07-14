@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import styles from './landing.module.css';
-import Footer from '../components/footer';
 import { signupUser, loginUser } from './userApi';
+import LoginMembers from '../members/loginMembers';
+import SignupMembers from '../members/signupMembers';
 
 const LandingPage = () => {
   const [showSignup, setShowSignup] = useState(false);
@@ -13,6 +14,16 @@ const LandingPage = () => {
   const [signupError, setSignupError] = useState({});
   const [signupLoading, setSignupLoading] = useState(false);
   const [signupSuccess, setSignupSuccess] = useState(false);
+
+  // Member modal state
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showSignupModal, setShowSignupModal] = useState(false);
+
+  const handleMemberLogin = () => setShowLoginModal(true);
+  const handleCloseLogin = () => setShowLoginModal(false);
+  const handleCloseSignup = () => setShowSignupModal(false);
+  const handleSwitchToSignup = () => { setShowLoginModal(false); setShowSignupModal(true); };
+  const handleSwitchToLogin = () => { setShowSignupModal(false); setShowLoginModal(true); };
 
   // Login handlers
   const handleLoginChange = (e) => {
@@ -111,6 +122,9 @@ const LandingPage = () => {
             Malawi's most trusted ride service. Fast, safe, and affordable rides at your fingertips.
           </p>
         </div>
+        <button className={styles.membersLoginBtn} type="button" onClick={handleMemberLogin}>
+          Members Login
+        </button>
         <form className={styles.loginForm} onSubmit={handleLoginSubmit}>
           <h2 className={styles.formTitle}>Sign In</h2>
           <input
@@ -205,8 +219,17 @@ const LandingPage = () => {
         </>
       )}
 
-      {/* Footer */}
-      <Footer />
+      {/* Member Login/Signup Modals */}
+      <LoginMembers 
+        isOpen={showLoginModal}
+        onClose={handleCloseLogin}
+        onSwitchToSignup={handleSwitchToSignup}
+      />
+      <SignupMembers 
+        isOpen={showSignupModal}
+        onClose={handleCloseSignup}
+        onSwitchToLogin={handleSwitchToLogin}
+      />
     </div>
   );
 };
