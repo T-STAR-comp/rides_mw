@@ -9,6 +9,7 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
+        id: '/',
         name: 'Rides MW',
         short_name: 'Rides',
         start_url: '.',
@@ -33,6 +34,12 @@ export default defineConfig({
             sizes: "1916x901",
             type: "image/png",
             form_factor: "wide"
+          },
+          {
+            src: "screenshot_mobile.png",
+            sizes: "540x720",
+            type: "image/png",
+            form_factor: "narrow"
           }
         ]
       }
