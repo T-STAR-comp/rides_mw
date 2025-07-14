@@ -1118,18 +1118,20 @@ const Home = () => {
         title={mapModalTitle}
       />
       {/* Bottom Navigation Bar for Mobile */}
-      <nav className={styles.bottomNav}>
-        <button className={styles.bottomNavBtn} onClick={() => setShowTrackModal(true)}>
-          {/* Compass/Track SVG Icon */}
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/><polygon points="12,7 15,17 12,15 9,17" fill="currentColor"/></svg>
-          <span>Track Ride</span>
-        </button>
-        <button className={styles.bottomNavBtn} onClick={() => setShowLogoutModal(true)}>
-          {/* Logout SVG Icon */}
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="4" width="13" height="16" rx="2" stroke="currentColor" strokeWidth="2"/><path d="M16 12h5m0 0l-2-2m2 2l-2 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-          <span>Logout</span>
-        </button>
-      </nav>
+      { !showModal && (
+        <nav className={styles.bottomNav}>
+          <button className={styles.bottomNavBtn} onClick={() => setShowTrackModal(true)}>
+            {/* Compass/Track SVG Icon */}
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/><polygon points="12,7 15,17 12,15 9,17" fill="currentColor"/></svg>
+            <span>Track Ride</span>
+          </button>
+          <button className={styles.bottomNavBtn} onClick={() => setShowLogoutModal(true)}>
+            {/* Logout SVG Icon */}
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="4" width="13" height="16" rx="2" stroke="currentColor" strokeWidth="2"/><path d="M16 12h5m0 0l-2-2m2 2l-2 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            <span>Logout</span>
+          </button>
+        </nav>
+      )}
     </div>
   );
 };

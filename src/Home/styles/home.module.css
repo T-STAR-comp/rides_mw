@@ -1331,6 +1331,7 @@ theway {
     left: 0;
     right: 0;
     transform: none;
+    bottom: 18px;
   }
   .bottomNavBtn {
     background: none;
@@ -1371,6 +1372,7 @@ theway {
 @media (max-width: 768px) {
   .logoutModal,
   .trackModal {
-    margin-bottom: 80px;
+    margin-bottom: 90px;
+    border-radius: 24px 24px 12px 12px;
   }
 }
