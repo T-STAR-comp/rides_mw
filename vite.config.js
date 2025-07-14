@@ -26,6 +26,14 @@ export default defineConfig({
             sizes: '512x512',
             type: 'image/png'
           }
+        ],
+        screenshots: [
+          {
+            src: "screenshot.png",
+            sizes: "1916x901",
+            type: "image/png",
+            form_factor: "wide"
+          }
         ]
       }
     })
