@@ -36,6 +36,7 @@ const LandingPage = () => {
     e.preventDefault();
     if (!loginData.email || !loginData.password) {
       setLoginError('Please enter both email and password.');
+      if (navigator.vibrate) navigator.vibrate([100]);
       return;
     }
     setLoginLoading(true);
@@ -54,6 +55,7 @@ const LandingPage = () => {
       window.location.reload();
     } catch (err) {
       setLoginError(err.message || 'Login failed');
+      if (navigator.vibrate) navigator.vibrate([100]);
     } finally {
       setLoginLoading(false);
     }
@@ -86,7 +88,10 @@ const LandingPage = () => {
 
   const handleSignupSubmit = async (e) => {
     e.preventDefault();
-    if (!validateSignup()) return;
+    if (!validateSignup()) {
+      if (navigator.vibrate) navigator.vibrate([100]);
+      return;
+    }
     setSignupLoading(true);
     setSignupSuccess(false);
     try {
@@ -103,6 +108,7 @@ const LandingPage = () => {
       }, 1800);
     } catch (err) {
       setSignupError((prev) => ({ ...prev, api: err.message || 'Signup failed' }));
+      if (navigator.vibrate) navigator.vibrate([100]);
     } finally {
       setSignupLoading(false);
     }
